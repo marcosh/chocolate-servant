@@ -1,0 +1,8 @@
+- patterns:
+  - .*\.hs$
+  - ^chocolate-servant.cabal$
+  - ^stack.yaml$
+  commands:
+  - stack exec killall chocolate-servant-exe
+  - stack build
+  - stack exec chocolate-servant-exe
