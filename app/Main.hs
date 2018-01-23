@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import           Models
 
 main :: IO ()
-main = startApp
+main = print "Hello!"
