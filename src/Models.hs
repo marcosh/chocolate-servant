@@ -11,7 +11,6 @@ module Models where
 
 import           Config               (Config, configPool)
 import           Control.Monad.Reader (MonadIO, MonadReader, asks, liftIO)
-import           Data.Aeson           (FromJSON, ToJSON)
 import           Data.Text            (Text)
 import           Data.Time.Clock      (UTCTime)
 import           Database.Persist.Sql (SqlPersistT, runMigration, runSqlPool)
