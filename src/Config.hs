@@ -1,21 +1,38 @@
-{-# LANGUAGE FlexibleInstances    #-}
-{-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE UndecidableInstances       #-}
 
 module Config where
 
 import           Control.Exception           (throwIO)
+import           Control.Monad.Except        (ExceptT, MonadError)
 import           Control.Monad.Logger        (MonadLogger, monadLoggerLog,
                                               toLogStr)
-import           Control.Monad.Reader        (MonadIO, liftIO)
+import           Control.Monad.Reader        (MonadIO, MonadReader, ReaderT,
+                                              liftIO)
 import           Control.Monad.Trans         (lift)
 import           Control.Monad.Trans.Maybe   (MaybeT (..), runMaybeT)
 import qualified Data.ByteString.Char8       as BS
 import           Data.Monoid                 ((<>))
 import           Database.Persist.Postgresql (ConnectionPool,
                                               createPostgresqlPool)
+import           Servant                     (ServantErr)
 import           System.Environment          (lookupEnv)
 import           System.Log.FastLogger       (fromLogStr)
+
+-- | This type represents the effects we want to have for our application.
+-- We wrap the standard Servant monad with 'ReaderT Config', which gives us
+-- access to the application configuration using the 'MonadReader'
+-- interface's 'ask' function.
+--
+-- By encapsulating the effects in our newtype, we can add layers to the
+-- monad stack without having to modify code that uses the current layout.
+newtype AppT m a
+    = AppT
+    { runApp :: ReaderT Config (ExceptT ServantErr m) a
+    } deriving ( Functor, Applicative, Monad, MonadReader Config,
+                 MonadError ServantErr, MonadIO)
 
 data Config
     = Config
@@ -23,7 +40,7 @@ data Config
     }
 
 instance (Monad m, MonadIO m) => MonadLogger m where
-    monadLoggerLog loc source level msg =
+    monadLoggerLog _ _ _ msg =
         liftIO $  putStrLn $ BS.unpack $ (fromLogStr . toLogStr) msg
 
 data Environment

@@ -18,6 +18,10 @@ import           Database.Persist.TH  (mkMigrate, mkPersist, persistLowerCase,
                                        share, sqlSettings)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
+    Producer json
+        address Text
+        country Text
+
     Chocolate json
         description Text
         cacaoPercentage Int
@@ -25,10 +29,6 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
         weight Int
         company ProducerId
         createdAt UTCTime
-
-    Producer json
-        address Text
-        country Text
 |]
 
 doMigrations :: SqlPersistT IO ()
