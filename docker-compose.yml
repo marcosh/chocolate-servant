@@ -1,0 +1,35 @@
+version: "3"
+services: 
+  
+  postgres:
+    image: postgres:10.1-alpine
+    container_name: chocolate-servant-postgres
+    environment:
+      - POSTGRES_USER=chocolate
+      - POSTGRES_PASSWORD=chocolate
+      - POSTRES_DB=chocolate
+    ports:
+      - "5432"
+    networks:
+      - postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: fenglc/pgadmin4:2.1
+    container_name: chocolate-servant-pgadmin
+    environment:
+      - DEFAULT_USER=chocolate@chocolate.com
+      - DEFAULT_PASSWORD=chocolate
+    networks:
+      - postgres
+    depends_on:
+      - postgres
+    ports:
+      - 8081:5050
+
+networks:
+  postgres:
+
+volumes:
+  postgres-data:
