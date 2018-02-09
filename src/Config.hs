@@ -15,7 +15,7 @@ import           Control.Monad.Trans         (lift)
 import           Control.Monad.Trans.Maybe   (MaybeT (..), runMaybeT)
 import qualified Data.ByteString.Char8       as BS
 import           Data.Monoid                 ((<>))
-import           Database.Persist.Postgresql (ConnectionPool,
+import           Database.Persist.Postgresql (ConnectionPool, ConnectionString,
                                               createPostgresqlPool)
 import           Servant                     (ServantErr)
 import           System.Environment          (lookupEnv)
@@ -72,9 +72,15 @@ makePool Production = do
     case pool of
         Nothing -> throwIO (userError "Database configuration not present in environment")
         Just a -> return a
-
+makePool Development =
+    createPostgresqlPool (connectionString "dev") (envPool Development)
+makePool Test =
+    createPostgresqlPool (connectionString "test") (envPool Test)
 
 envPool :: Environment -> Int
 envPool Test        = 1
 envPool Development = 1
 envPool Production  = 8
+
+connectionString :: BS.ByteString -> ConnectionString
+connectionString dbName = "host=localhost dbname=" <> dbName <> " user=user password=password port=5432"
