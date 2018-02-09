@@ -1,9 +1,37 @@
 version: "3"
 services: 
   
-  postgres:
+  postgres-test:
     image: postgres:10.1-alpine
-    container_name: chocolate-servant-postgres
+    container_name: chocolate-servant-postgres-test
+    environment:
+      - POSTGRES_USER=chocolate
+      - POSTGRES_PASSWORD=chocolate
+      - POSTRES_DB=chocolate
+    ports:
+      - 5434:5432
+    networks:
+      - postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  postgres-dev:
+    image: postgres:10.1-alpine
+    container_name: chocolate-servant-postgres-dev
+    environment:
+      - POSTGRES_USER=chocolate
+      - POSTGRES_PASSWORD=chocolate
+      - POSTRES_DB=chocolate
+    ports:
+      - 5433:5432
+    networks:
+      - postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  postgres-prod:
+    image: postgres:10.1-alpine
+    container_name: chocolate-servant-postgres-prod
     environment:
       - POSTGRES_USER=chocolate
       - POSTGRES_PASSWORD=chocolate
@@ -24,7 +52,8 @@ services:
     networks:
       - postgres
     depends_on:
-      - postgres
+      - postgres-test
+      - postgres-dev
     ports:
       - 8081:5050
 

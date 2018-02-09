@@ -82,5 +82,10 @@ envPool Test        = 1
 envPool Development = 1
 envPool Production  = 8
 
+connectionPort :: BS.ByteString -> BS.ByteString
+connectionPort "test" = "5434"
+connectionPort "dev"  = "5433"
+connectionPort _      = "5432"
+
 connectionString :: BS.ByteString -> ConnectionString
-connectionString dbName = "host=localhost dbname=" <> dbName <> " user=user password=password port=5432"
+connectionString env = "host=localhost dbname=chocolate user=chocolate password=chocolate port=" <> connectionPort env
